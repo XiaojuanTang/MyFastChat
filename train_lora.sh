@@ -1,0 +1,31 @@
+
+PATH_TO_DEEPSPEED_CONFIG=playground/deepspeed_config_s2.json
+deepspeed fastchat/train/train_lora.py \
+    --model_name_or_path /data2/mfx/huggingface/Llama-2-13b-hf  \
+    --lora_r 8 \
+    --lora_alpha 16 \
+    --lora_dropout 0.05 \
+    --data_path /home/txj/datasets/FOLIO/data/train_ft.json \
+    --output_dir ./checkpoint \
+    --num_train_epochs 150 \
+    --fp16 True \
+    --per_device_train_batch_size 2 \
+    --per_device_eval_batch_size 2  \
+    --gradient_accumulation_steps 1 \
+    --evaluation_strategy "steps" \
+    --eval_steps 10000  \
+    --save_strategy "steps" \
+    --save_steps 200 \
+    --save_total_limit 2 \
+    --learning_rate 2e-5 \
+    --weight_decay 0. \
+    --warmup_ratio 0.03 \
+    --lr_scheduler_type "cosine" \
+    --logging_strategy "steps" \
+    --logging_steps 1 \
+    --tf32 True \
+    --model_max_length 4096 \
+    --q_lora True \
+    --deepspeed $PATH_TO_DEEPSPEED_CONFIG \
+    --gradient_checkpointing True \
+    --flash_attn False
