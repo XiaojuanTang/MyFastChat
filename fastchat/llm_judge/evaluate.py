@@ -18,7 +18,8 @@ from tqdm import tqdm
 from fastchat.llm_judge.common import load_questions, temperature_config
 from fastchat.model import load_model, get_conversation_template
 
-
+# my code
+import re
 
 import logging
 def get_logger(filename, verbosity=1, name=None, func = 'w'):
@@ -199,7 +200,33 @@ def get_model_answers(
         logger.info('prediction: ' + output) 
         logger.info('grounding truth: ' + sample["conversations"][1]['value'])
         total_num += 1
-        if output == sample["conversations"][1]['value']:
+        # True or False
+        # answer_set = ['True', 'False']
+        # if (output.strip().split())[0] in answer_set or (output.strip().split('.'))[0] in answer_set or (output.strip().split(','))[0] in answer_set:
+        #     if output == sample["conversations"][1]['value']:
+        #         logger.info('Correct')
+        #         correct_num += 1
+        #     else:
+        #         logger.info('Wrong')
+
+        
+        # mycode
+        # split by ',' or '.'
+
+        prediction = re.split("[,.]", output)[0].lower()
+        if prediction != "true" and prediction != "false":
+            
+            q_pattern = r'"(.*?)"'
+            question_content = re.findall(q_pattern, sample["conversations"][0]['value'])[0]
+            a_pattern = question_content + r' is\s+(.*?)\.'
+            prediction = re.findall(a_pattern, output)[0].lower()
+            
+        
+            if prediction != "true" and prediction != "false":
+                logger.info("format error")
+                continue
+        
+        if prediction == sample["conversations"][1]['value'].lower():
             logger.info('Correct')
             correct_num += 1
         else:
