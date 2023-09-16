@@ -209,7 +209,7 @@ def get_model_answers(
         #     else:
         #         logger.info('Wrong')
 
-        
+
         # mycode
         # split by ',' or '.'
 
@@ -217,14 +217,24 @@ def get_model_answers(
         if prediction != "true" and prediction != "false":
             
             q_pattern = r'"(.*?)"'
+            
             question_content = re.findall(q_pattern, sample["conversations"][0]['value'])[0]
-            a_pattern = question_content + r' is\s+(.*?)\.'
+            if question_content[-1] == '.':
+                question_content_1 = "\"" + question_content[:-1] + "\""
+            else:
+                question_content_2 = "\"" + question_content + "\""
+            
+            a_pattern = question_content_1 + r' is\s+(.*?)\.'
             prediction = re.findall(a_pattern, output)[0].lower()
             
         
             if prediction != "true" and prediction != "false":
-                logger.info("format error")
-                continue
+                a_pattern = question_content_2 + r' is\s+(.*?)\.'
+                prediction = re.findall(a_pattern, output)[0].lower()
+            
+                if prediction != "true" and prediction != "false":
+                    logger.info("format error")
+                    continue
         
         if prediction == sample["conversations"][1]['value'].lower():
             logger.info('Correct')
